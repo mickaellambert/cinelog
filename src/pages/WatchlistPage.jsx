@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { PlusCircle, SlidersHorizontal } from 'lucide-react'
 import { AddForm } from '@/components/show/AddForm'
 import { Filters } from '@/components/show/Filters'
 import { List } from '@/components/show/List'
@@ -6,7 +7,6 @@ import { RatingModal } from '@/components/show/RatingModal'
 import { Button } from '@/components/ui/button'
 import {
   addToWatchlist,
-  removeFromWatchlist,
   filterByGenre,
   filterByStatus,
   sortByRating,
@@ -37,6 +37,18 @@ export function WatchlistPage() {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(watchlist))
   }, [watchlist])
+
+  function markUnwatched(id) {
+    const newWatchlist = []
+    for (let i = 0; i < watchlist.length; i++) {
+      if (watchlist[i].id === id) {
+        newWatchlist.push({ ...watchlist[i], status: 'to_watch', rating: null })
+      } else {
+        newWatchlist.push(watchlist[i])
+      }
+    }
+    setWatchlist(newWatchlist)
+  }
 
   function confirmRating(rating) {
     const newWatchlist = []
@@ -75,37 +87,58 @@ export function WatchlistPage() {
   )
 
   return (
-    <div className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">CineLog</h1>
-        {averageRating > 0 && (
-          <p className="text-sm text-muted-foreground">
-            Satisfaction moyenne :{' '}
-            <span className="font-medium text-foreground">
-              {averageRating.toFixed(1)} / 5
-            </span>
-          </p>
-        )}
-      </div>
+    <div className="min-h-screen bg-background">
+      <header className="bg-foreground px-6 py-4">
+        <div className="mx-auto flex max-w-5xl items-center justify-between">
+          <h1 className="text-xl font-bold text-background">CineLog</h1>
+          {averageRating > 0 && (
+            <p className="text-sm text-background/60">
+              Satisfaction moyenne :{' '}
+              <span className="font-semibold text-background">
+                {averageRating.toFixed(1)} / 5
+              </span>
+            </p>
+          )}
+        </div>
+      </header>
 
-      <AddForm onAdd={(show) => setWatchlist(addToWatchlist(watchlist, show))} />
+      <main className="mx-auto grid max-w-5xl grid-cols-1 gap-6 p-6 md:grid-cols-[320px_1fr]">
+        <aside className="flex flex-col gap-4">
+          <div className="rounded-lg border border-border bg-card p-4">
+            <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-foreground">
+              <PlusCircle className="h-4 w-4" />
+              Ajouter une série
+            </h2>
+            <AddForm onAdd={(show) => setWatchlist(addToWatchlist(watchlist, show))} />
+          </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <Filters filters={filters} onChange={setFilters} />
-        <Button
-          size="sm"
-          variant={isSortedByRating ? 'default' : 'outline'}
-          onClick={() => setIsSortedByRating(!isSortedByRating)}
-        >
-          Trier par note
-        </Button>
-      </div>
+          <div className="rounded-lg border border-border bg-card p-4">
+            <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-foreground">
+              <SlidersHorizontal className="h-4 w-4" />
+              Filtrer
+            </h2>
+            <div className="flex flex-col gap-3">
+              <Filters filters={filters} onChange={setFilters} />
+              <Button
+                size="sm"
+                variant={isSortedByRating ? 'default' : 'outline'}
+                className="w-full"
+                onClick={() => setIsSortedByRating(!isSortedByRating)}
+              >
+                Trier par note
+              </Button>
+            </div>
+          </div>
+        </aside>
 
-      <List
-        shows={displayedShows}
-        onRemove={(id) => setWatchlist(removeFromWatchlist(watchlist, id))}
-        onMarkWatched={setSelectedShow}
-      />
+        <section>
+          <List
+            shows={displayedShows}
+            onMarkWatched={setSelectedShow}
+            onMarkUnwatched={markUnwatched}
+          />
+        </section>
+      </main>
 
       <RatingModal
         show={selectedShow}
