@@ -12,6 +12,7 @@ import {
   sortByRating,
   calculateAverageRating,
 } from '@/lib/watchlist'
+import { DEFAULT_WATCHLIST } from '@/lib/showsData'
 
 const STORAGE_KEY = 'cinelog_watchlist'
 
@@ -25,7 +26,7 @@ function loadWatchlist() {
   if (stored) {
     return JSON.parse(stored)
   }
-  return []
+  return DEFAULT_WATCHLIST
 }
 
 export function WatchlistPage() {
