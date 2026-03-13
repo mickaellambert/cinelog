@@ -14,10 +14,19 @@ const badgeVariants = cva(
   }
 )
 
-export function StatusBadge({ status, className }) {
+export function StatusBadge({ status, onRemove, className }) {
   return (
-    <span className={cn(badgeVariants({ status }), className)}>
+    <span className={cn(badgeVariants({ status }), 'group', onRemove && 'cursor-pointer', className)}>
       {STATUSES[status]}
+      {onRemove && (
+        <button
+          type="button"
+          onClick={onRemove}
+          className="w-0 overflow-hidden opacity-0 transition-all duration-150 group-hover:w-3 group-hover:opacity-100 leading-none hover:text-green-900"
+        >
+          ×
+        </button>
+      )}
     </span>
   )
 }

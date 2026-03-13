@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button'
 import { StatusBadge } from '@/components/show/StatusBadge'
 import { Rating } from '@/components/show/Rating'
 
-export function Card({ show, onRemove, onMarkWatched }) {
+export function Card({ show, onMarkWatched, onMarkUnwatched }) {
   return (
     <div className="flex gap-4 rounded-lg border border-border bg-card p-4">
       <img
@@ -15,10 +15,15 @@ export function Card({ show, onRemove, onMarkWatched }) {
         <div className="flex flex-col gap-1">
           <div className="flex items-start justify-between gap-2">
             <h3 className="font-semibold text-foreground">{show.title}</h3>
-            <StatusBadge status={show.status} />
+            <StatusBadge
+              status={show.status}
+              onRemove={show.status === 'watched' ? () => onMarkUnwatched(show.id) : undefined}
+            />
           </div>
 
-          <p className="text-sm text-muted-foreground">{show.genre}</p>
+          <span className="inline-flex w-fit rounded-full border border-border px-2.5 py-0.5 text-xs text-muted-foreground">
+            {show.genre}
+          </span>
 
           {show.status === 'watched' && (
             <Rating value={show.rating} className="mt-1" />
@@ -32,13 +37,6 @@ export function Card({ show, onRemove, onMarkWatched }) {
             </Button>
           )}
 
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => onRemove(show.id)}
-          >
-            Supprimer
-          </Button>
         </div>
       </div>
     </div>

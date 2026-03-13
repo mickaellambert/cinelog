@@ -18,11 +18,17 @@ const EMPTY_FORM = {
 
 export function AddForm({ onAdd }) {
   const [form, setForm] = useState(EMPTY_FORM)
+  const [error, setError] = useState(null)
 
   function submit(e) {
     e.preventDefault()
 
-    if (!form.title || !form.genre) return
+    if (!form.title || !form.genre) {
+      setError('Le titre et le genre sont obligatoires.')
+      return
+    }
+
+    setError(null)
 
     onAdd({
       id: Date.now(),
@@ -65,6 +71,10 @@ export function AddForm({ onAdd }) {
         value={form.poster}
         onChange={(e) => setForm({ ...form, poster: e.target.value })}
       />
+
+      {error && (
+        <p className="text-sm text-destructive">{error}</p>
+      )}
 
       <Button type="submit">Ajouter</Button>
     </form>

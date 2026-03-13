@@ -1,6 +1,6 @@
 import { Card } from '@/components/show/Card'
 
-export function List({ shows, onRemove, onMarkWatched }) {
+export function List({ shows, onMarkWatched, onMarkUnwatched }) {
   if (shows.length === 0) {
     return (
       <p className="py-12 text-center text-muted-foreground">
@@ -16,8 +16,8 @@ export function List({ shows, onRemove, onMarkWatched }) {
       <Card
         key={shows[i].id}
         show={shows[i]}
-        onRemove={onRemove}
         onMarkWatched={onMarkWatched}
+        onMarkUnwatched={onMarkUnwatched}
       />
     )
   }

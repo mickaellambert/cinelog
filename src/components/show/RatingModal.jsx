@@ -27,7 +27,9 @@ export function RatingModal({ show, onConfirm, onClose }) {
     <Dialog open={show !== null} onOpenChange={close}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Tu as regardé {show?.title} ?</DialogTitle>
+          <DialogTitle className="font-bold text-gray-900">
+            Tu as regardé {show?.title} ?
+          </DialogTitle>
         </DialogHeader>
 
         <div className="flex flex-col items-center gap-4 py-4">
