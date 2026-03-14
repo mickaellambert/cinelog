@@ -1,30 +1,45 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { GENRES } from '@/lib/constants'
+import { ShowService } from '@/lib/ShowService'
 
-const EMPTY_FORM = {
-  title: '',
-  genre: '',
-  poster: '',
-}
+const showService = new ShowService()
 
 export function AddForm({ onAdd }) {
-  const [form, setForm] = useState(EMPTY_FORM)
+  const [query, setQuery] = useState('')
+  const [suggestions, setSuggestions] = useState([])
+  const [selected, setSelected] = useState(null)
+  const [isSearching, setIsSearching] = useState(false)
   const [error, setError] = useState(null)
+
+  useEffect(() => {
+    if (query.length < 2) {
+      setSuggestions([])
+      return
+    }
+
+    const timeout = setTimeout(async () => {
+      setIsSearching(true)
+      const results = await showService.search(query)
+      setSuggestions(results)
+      setIsSearching(false)
+    }, 400)
+
+    return () => clearTimeout(timeout)
+  }, [query])
+
+  async function selectSuggestion(suggestion) {
+    const details = await showService.getDetails(suggestion.imdbId)
+    setSelected(details)
+    setSuggestions([])
+    setQuery('')
+  }
 
   function submit(e) {
     e.preventDefault()
 
-    if (!form.title || !form.genre) {
-      setError('Le titre et le genre sont obligatoires.')
+    if (!selected) {
+      setError('Sélectionne une série dans les suggestions.')
       return
     }
 
@@ -32,51 +47,74 @@ export function AddForm({ onAdd }) {
 
     onAdd({
       id: Date.now(),
-      title: form.title,
-      genre: form.genre,
-      poster: form.poster || null,
+      title: selected.title,
+      genre: selected.genre,
+      poster: selected.poster,
       status: 'to_watch',
       rating: null,
     })
 
-    setForm(EMPTY_FORM)
+    setSelected(null)
+    setQuery('')
   }
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-3">
-      <Input
-        placeholder="Titre de la série *"
-        value={form.title}
-        onChange={(e) => setForm({ ...form, title: e.target.value })}
-      />
+      <div className="relative">
+        <Input
+          placeholder="Rechercher une série..."
+          value={query}
+          onChange={(e) => {
+            setQuery(e.target.value)
+            setSelected(null)
+          }}
+        />
 
-      <Select
-        value={form.genre}
-        onValueChange={(value) => setForm({ ...form, genre: value })}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="Genre *" />
-        </SelectTrigger>
-        <SelectContent>
-          {GENRES.map((genre) => (
-            <SelectItem key={genre} value={genre}>
-              {genre}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+        {isSearching && (
+          <p className="text-xs text-muted-foreground mt-1">Recherche en cours...</p>
+        )}
 
-      <Input
-        placeholder="URL de l'affiche (optionnel)"
-        value={form.poster}
-        onChange={(e) => setForm({ ...form, poster: e.target.value })}
-      />
+        {suggestions.length > 0 && (
+          <ul className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg overflow-hidden">
+            {suggestions.map((suggestion) => (
+              <li
+                key={suggestion.imdbId}
+                onClick={() => selectSuggestion(suggestion)}
+                className="flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-accent"
+              >
+                <img
+                  src={suggestion.poster ?? 'https://placehold.co/32x48?text=?'}
+                  alt={suggestion.title}
+                  className="w-8 h-12 object-cover rounded flex-shrink-0"
+                />
+                <span className="text-sm font-medium">{suggestion.title}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      {selected && (
+        <div className="flex items-center gap-3 p-3 rounded-md border border-border bg-muted">
+          <img
+            src={selected.poster ?? 'https://placehold.co/32x48?text=?'}
+            alt={selected.title}
+            className="w-8 h-12 object-cover rounded flex-shrink-0"
+          />
+          <div className="text-sm">
+            <p className="font-medium">{selected.title}</p>
+            <p className="text-muted-foreground">{selected.genre ?? 'Genre inconnu'}</p>
+          </div>
+        </div>
+      )}
 
       {error && (
         <p className="text-sm text-destructive">{error}</p>
       )}
 
-      <Button type="submit">Ajouter</Button>
+      <Button type="submit" disabled={!selected}>
+        Ajouter
+      </Button>
     </form>
   )
 }
