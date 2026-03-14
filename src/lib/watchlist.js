@@ -2,6 +2,9 @@ export function addToWatchlist(watchlist, show) {
   const newWatchlist = []
 
   for (let i = 0; i < watchlist.length; i++) {
+    if (watchlist[i].id === show.id) {
+      return watchlist
+    }
     newWatchlist.push(watchlist[i])
   }
 
@@ -44,7 +47,8 @@ export function filterByGenre(watchlist, genre) {
     }
   }
 
-  return watchlist
+  return newWatchlist
+  // Version alternative : return watchlist.filter(show => show.genre === genre)
 }
 
 export function filterByStatus(watchlist, status) {
@@ -87,12 +91,19 @@ export function calculateAverageRating(watchlist) {
   }
 
   let total = 0
+  let count = 0
 
   for (let i = 0; i < watchlist.length; i++) {
     if (watchlist[i].rating !== null) {
       total = total + watchlist[i].rating
+      count = count + 1
     }
   }
 
-  return total / watchlist.length
+  if (count === 0) {
+    return 0
+  }
+
+  return total / count
+  // Version alternative : watchlist.filter(s => s.rating !== null).reduce((sum, s) => sum + s.rating, 0) / count
 }

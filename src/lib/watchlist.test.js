@@ -1,5 +1,13 @@
 import { describe, it, expect } from 'vitest'
-import { addToWatchlist, removeFromWatchlist, isInWatchlist } from './watchlist'
+import {
+  addToWatchlist,
+  removeFromWatchlist,
+  isInWatchlist,
+  filterByGenre,
+  filterByStatus,
+  sortByRating,
+  calculateAverageRating,
+} from './watchlist'
 
 // ─── Données de test ──────────────────────────────────────────
 
@@ -27,84 +35,173 @@ const NARCOS = {
   rating: null,
 }
 
+const ARCANE = {
+  id: 4,
+  title: 'Arcane',
+  genre: 'Animation',
+  status: 'watched',
+  rating: 5,
+}
+
+const OZARK = {
+  id: 5,
+  title: 'Ozark',
+  genre: 'Thriller',
+  status: 'watched',
+  rating: 4,
+}
+
+const SQUID_GAME = {
+  id: 6,
+  title: 'Squid Game',
+  genre: 'Thriller',
+  status: 'watched',
+  rating: 3,
+}
+
 // ─── addToWatchlist ───────────────────────────────────────────
 
 describe('addToWatchlist', () => {
-  // ✅ Exemple complet — lis-le avant de continuer
   it('should add a show to an empty watchlist', () => {
     const result = addToWatchlist([], BREAKING_BAD)
     expect(result).toHaveLength(1)
     expect(result[0].title).toBe('Breaking Bad')
   })
 
-  // TODO — ajouter une série à une liste qui en contient déjà une
-  // Hint : pars d'une liste avec BREAKING_BAD, ajoute DARK
-  // La liste résultante doit contenir 2 éléments
   it('should add a show to an existing watchlist', () => {
-    // ⚠️ Ne pas supprimer — garantit que tu as bien écrit au moins un expect() ci-dessous
-    // Sans cette ligne, un test vide passerait au vert sans rien vérifier
-    expect.hasAssertions()
+    const result = addToWatchlist([BREAKING_BAD], DARK)
+    expect(result).toHaveLength(2)
   })
 
-  // TODO — essaie d'ajouter une série déjà présente dans la liste
-  // Hint : appelle addToWatchlist deux fois avec BREAKING_BAD
-  // La liste résultante devrait contenir 1 seul élément... mais est-ce vraiment le cas ?
   it('should not add a show already in the list', () => {
-    // ⚠️ Ne pas supprimer — garantit que tu as bien écrit au moins un expect() ci-dessous
-    // Sans cette ligne, un test vide passerait au vert sans rien vérifier
-    expect.hasAssertions()
+    const watchlist = [BREAKING_BAD]
+    const result = addToWatchlist(watchlist, BREAKING_BAD)
+    expect(result).toHaveLength(1)
   })
 })
 
 // ─── removeFromWatchlist ──────────────────────────────────────
 
 describe('removeFromWatchlist', () => {
-  // ✅ Exemple complet — la fonction reçoit une liste et l'id de la série à supprimer
   it('should remove a show from the watchlist', () => {
     const result = removeFromWatchlist([BREAKING_BAD, DARK], 1)
     expect(result).toHaveLength(1)
     expect(result[0].title).toBe('Dark')
   })
 
-  // TODO — que se passe-t-il si l'id ne correspond à aucune série ?
-  // Hint : pars d'une liste avec BREAKING_BAD et DARK, essaie de supprimer l'id 99
-  // La liste doit rester intacte (2 éléments)
   it('should return the same list if the show is not found', () => {
-    // ⚠️ Ne pas supprimer — garantit que tu as bien écrit au moins un expect() ci-dessous
-    // Sans cette ligne, un test vide passerait au vert sans rien vérifier
-    expect.hasAssertions()
+    const result = removeFromWatchlist([BREAKING_BAD, DARK], 99)
+    expect(result).toHaveLength(2)
   })
 
-  // TODO — supprimer la seule série d'une liste à un élément
-  // Résultat attendu : une liste vide
   it('should return an empty list if the only show is removed', () => {
-    // ⚠️ Ne pas supprimer — garantit que tu as bien écrit au moins un expect() ci-dessous
-    // Sans cette ligne, un test vide passerait au vert sans rien vérifier
-    expect.hasAssertions()
+    const result = removeFromWatchlist([BREAKING_BAD], 1)
+    expect(result).toHaveLength(0)
   })
 })
 
 // ─── isInWatchlist ────────────────────────────────────────────
 
 describe('isInWatchlist', () => {
-  // ✅ Exemple complet
   it('should return true if the show is in the watchlist', () => {
     const result = isInWatchlist([BREAKING_BAD, DARK], 1)
     expect(result).toBe(true)
   })
 
-  // TODO — vérifier que la fonction retourne false si la série n'est pas dans la liste
-  // Hint : utilise une liste avec BREAKING_BAD et DARK, cherche l'id de NARCOS
   it('should return false if the show is not in the watchlist', () => {
-    // ⚠️ Ne pas supprimer — garantit que tu as bien écrit au moins un expect() ci-dessous
-    // Sans cette ligne, un test vide passerait au vert sans rien vérifier
-    expect.hasAssertions()
+    const result = isInWatchlist([BREAKING_BAD, DARK], NARCOS.id)
+    expect(result).toBe(false)
   })
 
-  // TODO — cas limite : que retourne la fonction sur une liste vide ?
   it('should return false for an empty watchlist', () => {
-    // ⚠️ Ne pas supprimer — garantit que tu as bien écrit au moins un expect() ci-dessous
-    // Sans cette ligne, un test vide passerait au vert sans rien vérifier
-    expect.hasAssertions()
+    const result = isInWatchlist([], 1)
+    expect(result).toBe(false)
+  })
+})
+
+// ─── filterByGenre ────────────────────────────────────────────
+
+describe('filterByGenre', () => {
+  it('should return only shows matching the genre', () => {
+    const result = filterByGenre([BREAKING_BAD, DARK, NARCOS], 'Crime')
+    expect(result).toHaveLength(2)
+    expect(result[0].title).toBe('Breaking Bad')
+    expect(result[1].title).toBe('Narcos')
+  })
+
+  it('should return an empty list if no show matches the genre', () => {
+    const result = filterByGenre([BREAKING_BAD, NARCOS], 'Sci-Fi')
+    expect(result).toHaveLength(0)
+  })
+
+  it('should return an empty list for an empty watchlist', () => {
+    const result = filterByGenre([], 'Crime')
+    expect(result).toHaveLength(0)
+  })
+})
+
+// ─── filterByStatus ───────────────────────────────────────────
+
+describe('filterByStatus', () => {
+  it('should return only shows matching the status', () => {
+    const result = filterByStatus([BREAKING_BAD, ARCANE], 'watched')
+    expect(result).toHaveLength(1)
+    expect(result[0].title).toBe('Arcane')
+  })
+
+  it('should return an empty list if no show matches the status', () => {
+    const result = filterByStatus([ARCANE, OZARK], 'to_watch')
+    expect(result).toHaveLength(0)
+  })
+
+  it('should return an empty list for an empty watchlist', () => {
+    const result = filterByStatus([], 'watched')
+    expect(result).toHaveLength(0)
+  })
+})
+
+// ─── sortByRating ─────────────────────────────────────────────
+
+describe('sortByRating', () => {
+  it('should sort shows from highest to lowest rating', () => {
+    const result = sortByRating([SQUID_GAME, ARCANE, OZARK])
+    expect(result[0].title).toBe('Arcane')
+    expect(result[1].title).toBe('Ozark')
+    expect(result[2].title).toBe('Squid Game')
+  })
+
+  it('should not modify the original watchlist', () => {
+    const watchlist = [SQUID_GAME, ARCANE, OZARK]
+    sortByRating(watchlist)
+    expect(watchlist[0].title).toBe('Squid Game')
+  })
+
+  it('should return an empty list for an empty watchlist', () => {
+    const result = sortByRating([])
+    expect(result).toHaveLength(0)
+  })
+})
+
+// ─── calculateAverageRating ───────────────────────────────────
+
+describe('calculateAverageRating', () => {
+  it('should calculate the average of rated shows', () => {
+    const result = calculateAverageRating([ARCANE, OZARK])
+    expect(result).toBe(4.5)
+  })
+
+  it('should ignore shows without a rating', () => {
+    const result = calculateAverageRating([ARCANE, BREAKING_BAD])
+    expect(result).toBe(5)
+  })
+
+  it('should return 0 for an empty watchlist', () => {
+    const result = calculateAverageRating([])
+    expect(result).toBe(0)
+  })
+
+  it('should return 0 if no show is rated', () => {
+    const result = calculateAverageRating([BREAKING_BAD, DARK])
+    expect(result).toBe(0)
   })
 })
