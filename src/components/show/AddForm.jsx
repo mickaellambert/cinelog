@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { searchShows, getShowDetails } from '@/lib/showService'
+import { isInWatchlist } from '@/lib/watchlist'
 
-export function AddForm({ onAdd }) {
+export function AddForm({ watchlist, onAdd }) {
   const [query, setQuery] = useState('')
   const [suggestions, setSuggestions] = useState([])
   const [selected, setSelected] = useState(null)
@@ -41,10 +42,15 @@ export function AddForm({ onAdd }) {
       return
     }
 
+    if (isInWatchlist(watchlist, selected.imdbId)) {
+      setError('Cette série est déjà dans ta liste.')
+      return
+    }
+
     setError(null)
 
     onAdd({
-      id: Date.now(),
+      id: selected.imdbId,
       title: selected.title,
       genre: selected.genre,
       poster: selected.poster,
@@ -84,6 +90,7 @@ export function AddForm({ onAdd }) {
                   src={suggestion.poster ?? 'https://placehold.co/32x48?text=?'}
                   alt={suggestion.title}
                   className="w-8 h-12 object-cover rounded flex-shrink-0"
+                  onError={(e) => { e.target.src = 'https://placehold.co/32x48?text=?' }}
                 />
                 <span className="text-sm font-medium">{suggestion.title}</span>
               </li>
@@ -98,6 +105,7 @@ export function AddForm({ onAdd }) {
             src={selected.poster ?? 'https://placehold.co/32x48?text=?'}
             alt={selected.title}
             className="w-8 h-12 object-cover rounded flex-shrink-0"
+            onError={(e) => { e.target.src = 'https://placehold.co/32x48?text=?' }}
           />
           <div className="text-sm">
             <p className="font-medium">{selected.title}</p>

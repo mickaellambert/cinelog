@@ -108,7 +108,7 @@ export function WatchlistPage() {
               <PlusCircle className="h-4 w-4" />
               Ajouter une série
             </h2>
-            <AddForm onAdd={(show) => setWatchlist(addToWatchlist(watchlist, show))} />
+            <AddForm watchlist={watchlist} onAdd={(show) => setWatchlist(addToWatchlist(watchlist, show))} />
           </div>
 
           <div className="rounded-lg border border-border bg-card p-4">

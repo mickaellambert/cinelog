@@ -3,7 +3,7 @@ const BASE_URL = 'https://www.omdbapi.com'
 
 export async function searchShows(query) {
   const response = await fetch(
-    `${BASE_URL}/?s=${encodeURIComponent(query)}&type=series&apikey=${API_KEY}`
+    `${BASE_URL}/?s=${encodeURIComponent(query.trim())}&type=series&apikey=${API_KEY}`
   )
   const data = await response.json()
 

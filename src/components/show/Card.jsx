@@ -9,6 +9,7 @@ export function Card({ show, onMarkWatched, onMarkUnwatched }) {
         src={show.poster ?? 'https://placehold.co/80x120?text=?'}
         alt={show.title}
         className="h-28 w-20 rounded object-cover shrink-0"
+        onError={(e) => { e.target.src = 'https://placehold.co/80x120?text=?' }}
       />
 
       <div className="flex flex-1 flex-col justify-between">
