@@ -2,9 +2,6 @@ import { describe, it, expect } from 'vitest'
 import { addToWatchlist, removeFromWatchlist, isInWatchlist } from './watchlist'
 
 // ─── Données de test ──────────────────────────────────────────
-//
-// On définit des séries "fixes" en dehors des tests pour ne pas
-// les réécrire à chaque fois. C'est une bonne pratique.
 
 const BREAKING_BAD = {
   id: 1,
@@ -33,68 +30,56 @@ const NARCOS = {
 // ─── addToWatchlist ───────────────────────────────────────────
 
 describe('addToWatchlist', () => {
-  // ✅ Exemple fourni — lis-le attentivement avant de continuer
+  // ✅ Exemple complet — lis-le avant de continuer
   it('should add a show to an empty watchlist', () => {
     const result = addToWatchlist([], BREAKING_BAD)
     expect(result).toHaveLength(1)
+    expect(result[0].title).toBe('Breaking Bad')
   })
 
   // TODO — ajouter une série à une liste qui en contient déjà une
-  // Vérifie que la liste résultante contient bien 2 éléments
+  // Hint : pars d'une liste avec BREAKING_BAD, ajoute DARK
+  // La liste résultante doit contenir 2 éléments
   it('should add a show to an existing watchlist', () => {})
-
-  // TODO — vérifier que la fonction ne modifie pas la liste d'origine
-  // Hint : appelle addToWatchlist, puis vérifie que watchlist.length n'a pas changé
-  it('should not modify the original watchlist', () => {
-    const watchlist = [BREAKING_BAD]
-    addToWatchlist(watchlist, DARK)
-    // à compléter
-  })
 
   // TODO — essaie d'ajouter une série déjà présente dans la liste
   // Hint : appelle addToWatchlist deux fois avec BREAKING_BAD
-  // La liste résultante devrait toujours contenir 1 élément... mais est-ce le cas ?
+  // La liste résultante devrait contenir 1 seul élément... mais est-ce vraiment le cas ?
   it('should not add a show already in the list', () => {})
 })
 
 // ─── removeFromWatchlist ──────────────────────────────────────
 
 describe('removeFromWatchlist', () => {
-  // ✅ Exemple fourni
-  it('should remove a show by id', () => {
-    const result = removeFromWatchlist([BREAKING_BAD, DARK], BREAKING_BAD.id)
+  // ✅ Exemple complet — la fonction reçoit une liste et l'id de la série à supprimer
+  it('should remove a show from the watchlist', () => {
+    const result = removeFromWatchlist([BREAKING_BAD, DARK], 1)
     expect(result).toHaveLength(1)
-    // TODO — vérifie aussi que c'est bien DARK qui reste dans la liste
-    // Hint : expect(result[0].id).toBe(...)
+    expect(result[0].title).toBe('Dark')
   })
 
-  // TODO — que se passe-t-il si on essaie de supprimer un id qui n'existe pas ?
-  // La liste originale doit être retournée intacte
-  it('should return the same list if the id does not exist', () => {
-    const watchlist = [BREAKING_BAD, DARK]
-    // à compléter
-  })
+  // TODO — que se passe-t-il si l'id ne correspond à aucune série ?
+  // Hint : pars d'une liste avec BREAKING_BAD et DARK, essaie de supprimer l'id 99
+  // La liste doit rester intacte (2 éléments)
+  it('should return the same list if the show is not found', () => {})
 
   // TODO — supprimer la seule série d'une liste à un élément
   // Résultat attendu : une liste vide
   it('should return an empty list if the only show is removed', () => {})
-
-  // TODO — vérifier que la fonction ne modifie pas la liste d'origine
-  // Même principe que pour addToWatchlist
-  it('should not modify the original watchlist', () => {})
 })
 
 // ─── isInWatchlist ────────────────────────────────────────────
 
 describe('isInWatchlist', () => {
-  // TODO — BREAKING_BAD est dans la liste : la fonction doit retourner true
-  it('should return true if the show is in the watchlist', () => {})
-
-  // TODO — NARCOS n'est pas dans la liste : la fonction doit retourner false
-  it('should return false if the show is not in the watchlist', () => {
-    const watchlist = [BREAKING_BAD, DARK]
-    // à compléter
+  // ✅ Exemple complet
+  it('should return true if the show is in the watchlist', () => {
+    const result = isInWatchlist([BREAKING_BAD, DARK], 1)
+    expect(result).toBe(true)
   })
+
+  // TODO — vérifier que la fonction retourne false si la série n'est pas dans la liste
+  // Hint : utilise une liste avec BREAKING_BAD et DARK, cherche l'id de NARCOS
+  it('should return false if the show is not in the watchlist', () => {})
 
   // TODO — cas limite : que retourne la fonction sur une liste vide ?
   it('should return false for an empty watchlist', () => {})
