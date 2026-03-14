@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { ShowService } from '@/lib/ShowService'
-
-const showService = new ShowService()
+import { searchShows, getShowDetails } from '@/lib/showService'
 
 export function AddForm({ onAdd }) {
   const [query, setQuery] = useState('')
@@ -20,7 +18,7 @@ export function AddForm({ onAdd }) {
 
     const timeout = setTimeout(async () => {
       setIsSearching(true)
-      const results = await showService.search(query)
+      const results = await searchShows(query)
       setSuggestions(results)
       setIsSearching(false)
     }, 400)
@@ -29,7 +27,7 @@ export function AddForm({ onAdd }) {
   }, [query])
 
   async function selectSuggestion(suggestion) {
-    const details = await showService.getDetails(suggestion.imdbId)
+    const details = await getShowDetails(suggestion.imdbId)
     setSelected(details)
     setSuggestions([])
     setQuery('')
