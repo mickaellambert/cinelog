@@ -1,18 +1,16 @@
 import { describe, it, expect } from 'vitest'
-import { ShowService } from './ShowService'
+import { searchShows } from './showService'
 
 // ─────────────────────────────────────────────────────────────
 // Bienvenue dans l'atelier "Tester sans mock".
 //
-// Ce fichier teste ShowService en appelant la VRAIE API OMDb.
+// Ce fichier teste searchShows en appelant la VRAIE API OMDb.
 // Pas de simulation, pas de données inventées — le vrai réseau.
 //
 // Lance les tests avec : npm test
 // Observe attentivement ce qui se passe.
 // Certains tests vont poser problème — c'est volontaire.
 // ─────────────────────────────────────────────────────────────
-
-const showService = new ShowService()
 
 describe('ShowService', () => {
   // ✅ Exemple complet — lis-le attentivement avant de continuer
@@ -25,7 +23,7 @@ describe('ShowService', () => {
   // Pose-toi la question : que se passe-t-il si OMDb est en maintenance
   // ce matin et que tu dois présenter ton projet ?
   it('should return results for "Breaking Bad"', async () => {
-    const results = await showService.search('Breaking Bad')
+    const results = await searchShows('Breaking Bad')
     expect(results.length).toBeGreaterThan(0)
   }, 10000)
 
