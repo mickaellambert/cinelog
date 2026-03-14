@@ -40,12 +40,16 @@ describe('addToWatchlist', () => {
   // TODO — ajouter une série à une liste qui en contient déjà une
   // Hint : pars d'une liste avec BREAKING_BAD, ajoute DARK
   // La liste résultante doit contenir 2 éléments
-  it('should add a show to an existing watchlist', () => {})
+  it('should add a show to an existing watchlist', () => {
+    expect.hasAssertions()
+  })
 
   // TODO — essaie d'ajouter une série déjà présente dans la liste
   // Hint : appelle addToWatchlist deux fois avec BREAKING_BAD
   // La liste résultante devrait contenir 1 seul élément... mais est-ce vraiment le cas ?
-  it('should not add a show already in the list', () => {})
+  it('should not add a show already in the list', () => {
+    expect.hasAssertions()
+  })
 })
 
 // ─── removeFromWatchlist ──────────────────────────────────────
@@ -61,11 +65,15 @@ describe('removeFromWatchlist', () => {
   // TODO — que se passe-t-il si l'id ne correspond à aucune série ?
   // Hint : pars d'une liste avec BREAKING_BAD et DARK, essaie de supprimer l'id 99
   // La liste doit rester intacte (2 éléments)
-  it('should return the same list if the show is not found', () => {})
+  it('should return the same list if the show is not found', () => {
+    expect.hasAssertions()
+  })
 
   // TODO — supprimer la seule série d'une liste à un élément
   // Résultat attendu : une liste vide
-  it('should return an empty list if the only show is removed', () => {})
+  it('should return an empty list if the only show is removed', () => {
+    expect.hasAssertions()
+  })
 })
 
 // ─── isInWatchlist ────────────────────────────────────────────
@@ -79,8 +87,12 @@ describe('isInWatchlist', () => {
 
   // TODO — vérifier que la fonction retourne false si la série n'est pas dans la liste
   // Hint : utilise une liste avec BREAKING_BAD et DARK, cherche l'id de NARCOS
-  it('should return false if the show is not in the watchlist', () => {})
+  it('should return false if the show is not in the watchlist', () => {
+    expect.hasAssertions()
+  })
 
   // TODO — cas limite : que retourne la fonction sur une liste vide ?
-  it('should return false for an empty watchlist', () => {})
+  it('should return false for an empty watchlist', () => {
+    expect.hasAssertions()
+  })
 })
