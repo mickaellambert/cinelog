@@ -1,79 +1,67 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { searchShows } from './showService'
 
-// ─────────────────────────────────────────────────────────────
-// Bienvenue dans l'atelier "Tester sans mock".
-//
-// Ce fichier teste searchShows en appelant la VRAIE API OMDb.
-// Pas de simulation, pas de données inventées — le vrai réseau.
-//
-// Lance les tests avec : npm test
-// Observe attentivement ce qui se passe.
-// Certains tests vont poser problème — c'est volontaire.
-// ─────────────────────────────────────────────────────────────
+// On remplace fetch par une fonction factice pour tous les tests de ce fichier
+global.fetch = vi.fn()
 
-describe('ShowService', () => {
-  // ✅ Exemple complet — lis-le attentivement avant de continuer
+describe('ShowService — avec mocks', () => {
+
+  // ✅ Test 1 — les champs OMDb sont correctement transformés
   //
-  // Ce test appelle la vraie API OMDb.
-  // Il passe... mais remarque deux choses :
-  //   1. La durée d'exécution (regarde le temps affiché par Vitest)
-  //   2. Le timeout à 10000ms en bas — sans ça, Vitest abandonne après 5s
-  //
-  // Pose-toi la question : que se passe-t-il si OMDb est en maintenance
-  // ce matin et que tu dois présenter ton projet ?
-  it('should return results for "Breaking Bad"', async () => {
+  // On vérifie que searchShows renomme les champs de l'API vers notre format :
+  //   imdbID → imdbId
+  //   Title  → title
+  //   Poster → poster
+  it('should map OMDb fields to our format', async () => {
+    fetch.mockResolvedValueOnce({
+      json: () => Promise.resolve({
+        Response: 'True',
+        Search: [
+          { imdbID: 'tt0903747', Title: 'Breaking Bad', Poster: 'https://fake.jpg' },
+        ],
+      }),
+    })
+
     const results = await searchShows('Breaking Bad')
-    expect(results.length).toBeGreaterThan(0)
-  }, 10000)
 
-  // TODO — vérifie que le premier résultat contient bien un titre et une affiche
-  //
-  // Hint : cherche "Narcos" et inspecte results[0].title et results[0].poster
-  //
-  // Ce test va probablement passer... mais réfléchis :
-  //   - Est-ce que toutes les séries ont forcément une affiche sur OMDb ?
-  //   - Si demain OMDb change son format de réponse, ton test casse
-  //   - Tu ne contrôles pas ce que l'API retourne — c'est OMDb qui décide
-  //
-  // Note : tape le mot entier (ex: "Narcos" et pas "Narc") —
-  // OMDb recherche sur des mots complets, pas des fragments
-  it('should return shows with a title and a poster', async () => {
-    // ⚠️ Ne pas supprimer — garantit que tu as bien écrit au moins un expect() ci-dessous
-    // Sans cette ligne, un test vide passerait au vert sans rien vérifier
-    expect.hasAssertions()
-  }, 10000)
+    expect(results[0].imdbId).toBe('tt0903747')
+    expect(results[0].title).toBe('Breaking Bad')
+    expect(results[0].poster).toBe('https://fake.jpg')
+  })
 
-  // TODO — vérifie que le service gère correctement une erreur de l'API
+  // ✅ Test 2 — Poster: 'N/A' est transformé en null
   //
-  // Par exemple : que se passe-t-il si OMDb répond avec une erreur 500 ?
-  // Notre service devrait retourner [] plutôt que de planter.
+  // OMDb retourne la chaîne 'N/A' quand une série n'a pas d'affiche.
+  // Notre service doit convertir ça en null.
+  it('should return null when poster is N/A', async () => {
+    fetch.mockResolvedValueOnce({
+      json: () => Promise.resolve({
+        Response: 'True',
+        Search: [
+          { imdbID: 'tt9999999', Title: 'Série sans affiche', Poster: 'N/A' },
+        ],
+      }),
+    })
+
+    const results = await searchShows('Série sans affiche')
+
+    expect(results[0].poster).toBeNull()
+  })
+
+  // ✅ Test 3 — l'API retourne une erreur → searchShows retourne []
   //
-  // Essaie d'écrire ce test. Tu vas te heurter à un problème :
-  //   Comment tu provoques une erreur 500 sur les serveurs d'OMDb ?
-  //   Tu ne peux pas. Ce n'est pas ton serveur.
-  //
-  // C'est exactement le problème qu'on va résoudre avec les mocks.
-  // Pour l'instant, laisse ce test de côté et note pourquoi tu bloques.
+  // OMDb retourne { Response: 'False' } quand il ne trouve rien ou en cas d'erreur.
+  // Notre service doit retourner un tableau vide dans ce cas.
   it('should return an empty array when the API returns an error', async () => {
-    // ⚠️ Ne pas supprimer — garantit que tu as bien écrit au moins un expect() ci-dessous
-    // Sans cette ligne, un test vide passerait au vert sans rien vérifier
-    expect.hasAssertions()
-  }, 10000)
+    fetch.mockResolvedValueOnce({
+      json: () => Promise.resolve({
+        Response: 'False',
+      }),
+    })
 
-  // TODO — vérifie que le service gère un timeout réseau
-  //
-  // Imagine que la connexion est très lente ou coupée.
-  // Notre service devrait gérer ça proprement.
-  //
-  // Même problème qu'au-dessus : comment tu coupes internet
-  // pendant un test automatisé ? Tu ne peux pas.
-  //
-  // Ce test est volontairement impossible à écrire ici.
-  // Garde-le tel quel et retiens pourquoi — c'est le sujet du cours de cet après-midi.
-  it('should handle a network timeout', async () => {
-    // ⚠️ Ne pas supprimer — garantit que tu as bien écrit au moins un expect() ci-dessous
-    // Sans cette ligne, un test vide passerait au vert sans rien vérifier
-    expect.hasAssertions()
-  }, 10000)
+    const results = await searchShows('xkzqjmwplf')
+
+    expect(results).toEqual([])
+  })
+
 })
