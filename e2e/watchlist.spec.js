@@ -10,6 +10,16 @@ import { test, expect } from '@playwright/test'
 // Ouvre le rapport avec : npx playwright show-report
 // ─────────────────────────────────────────────────────────────
 
+// Vide la watchlist avant chaque test pour partir d'une liste propre.
+// L'app charge des séries par défaut — sans ça, elles interfèrent avec nos vérifications.
+test.beforeEach(async ({ page }) => {
+  await page.goto('/')
+  await page.evaluate(() => {
+    localStorage.setItem('cinelog_watchlist', JSON.stringify([]))
+  })
+  await page.reload()
+})
+
 test.describe('CineLog', () => {
 
   // ✅ Scénario 1 — ajouter une série à la watchlist
@@ -22,13 +32,12 @@ test.describe('CineLog', () => {
   //
   // Les étapes 1 et 2 sont écrites pour toi — complète la suite.
   test('should add a show to the watchlist', async ({ page }) => {
-    await page.goto('/')
-
     // Tape le titre dans le champ de saisie
     await page.getByPlaceholder('Titre de la série *').fill('Breaking Bad')
 
     // Ouvre la liste déroulante et sélectionne un genre
-    await page.getByRole('combobox').click()
+    // Note : page.locator('form') est nécessaire car il y a aussi un select dans les filtres
+    await page.locator('form').getByRole('combobox').click()
     await page.getByRole('option', { name: 'Crime' }).click()
 
     // TODO — clique sur le bouton "Ajouter"
