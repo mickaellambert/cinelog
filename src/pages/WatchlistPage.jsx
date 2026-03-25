@@ -83,9 +83,7 @@ export function WatchlistPage() {
   }
 
   const displayedShows = getDisplayedShows()
-  const averageRating = calculateAverageRating(
-    filterByStatus(watchlist, 'watched')
-  )
+  const averageRating = calculateAverageRating(watchlist)
 
   return (
     <div className="min-h-screen bg-background">
