@@ -4,6 +4,8 @@ import { defineConfig, devices } from '@playwright/test'
 export default defineConfig({
   testDir: './e2e',
 
+  reporter: 'html',
+
   use: {
     // L'URL de base de l'app — Vite démarre sur ce port par défaut
     baseURL: 'http://localhost:5173',
